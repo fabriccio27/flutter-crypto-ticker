@@ -1,24 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:bitcoin_ticker_updated/coin_data.dart';
+import 'package:flutter/cupertino.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
 
+
+
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = currenciesList[0];
-  void onCurrencyChange(String newCurrency) {
+  void onCurrencyChange(dynamic newCurrency) {
     setState(() {
-      selectedCurrency = newCurrency;
+      selectedCurrency = newCurrency.toString();
     });
+  }
+
+
+  DropdownButton getRegularDropdown() {
+   return DropdownButton(
+    value: selectedCurrency,
+    items: currenciesList.map(
+      (e) => DropdownMenuItem(value: e, child: Text(e),)
+    ).toList(),
+    onChanged: onCurrencyChange,
+    );
+  }
+
+  CupertinoPicker iOSPicker() {
+
+    return CupertinoPicker(
+      itemExtent: 32,
+      onSelectedItemChanged: onCurrencyChange,
+      children: currenciesList.map((e) => Text(e)).toList()
+    );
+  }
+
+
+  Widget getPicker() {
+    if (Platform.isIOS) {
+      return iOSPicker();
+    }
+    return getRegularDropdown();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('🤑 Coin Ticker'),
+        title: const Text('🤑 Coin Ticker'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -48,17 +80,9 @@ class _PriceScreenState extends State<PriceScreen> {
           Container(
             height: 150.0,
             alignment: Alignment.center,
-            padding: EdgeInsets.only(bottom: 30.0),
+            padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton(
-              value: selectedCurrency,
-              items: currenciesList.map(
-                (e) => DropdownMenuItem(child: Text(e), value: e)
-              ).toList(),
-              onChanged: (value){ setState(() {
-                selectedCurrency = value.toString();
-              });},
-            ),
+            child: getPicker(),
           ),
         ],
       ),
