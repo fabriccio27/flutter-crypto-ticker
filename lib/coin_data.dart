@@ -31,7 +31,7 @@ const List<String> cryptoList = [
 ];
 
 class CoinData {
-  RequestsHelper requestsHelper = RequestsHelper({"X-CoinAPI-Key": '38E17CC5-F0F0-4535-B27F-AA04DAA61E0D'});
+  RequestsHelper requestsHelper = RequestsHelper({"X-CoinAPI-Key": 'bogus-key'});
 
   Future<String> getExchangeRate(String currency) async {
     Uri url = Uri.https('rest.coinapi.io', '/v1/exchangerate/BTC/$currency');
