@@ -10,13 +10,36 @@ class PriceScreen extends StatefulWidget {
 
 
 
+
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = currenciesList[0];
+  String exchangeRate = '?';
+
+
   void onCurrencyChange(dynamic newCurrency) {
+    // this needs to fetch data and set both select currency and exchange rate
     setState(() {
       selectedCurrency = newCurrency.toString();
     });
   }
+  // need to override onInit to fetch always usd
+  @override
+  initState(){
+    super.initState();
+    getTickerData();
+  }
+
+  void getTickerData() async {
+    CoinData coinService = CoinData();
+    String responseRate = await coinService.getExchangeRate(selectedCurrency);
+    setState(() {
+      exchangeRate = responseRate;
+    });
+
+  }
+  
+  // then need to fetch whenever we change the currency
+  // then we need to resolve multiple promises/ futures at the same time
 
 
   DropdownButton getRegularDropdown() {
@@ -38,7 +61,6 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-
   Widget getPicker() {
     if (Platform.isIOS) {
       return iOSPicker();
@@ -57,7 +79,7 @@ class _PriceScreenState extends State<PriceScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
             child: Card(
               color: Colors.lightBlueAccent,
               elevation: 5.0,
@@ -65,11 +87,11 @@ class _PriceScreenState extends State<PriceScreen> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = $exchangeRate USD',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20.0,
                     color: Colors.white,
                   ),
