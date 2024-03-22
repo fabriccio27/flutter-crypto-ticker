@@ -49,9 +49,9 @@ class CoinData {
       requestsHelper.getData(ethUrl),
       requestsHelper.getData(ltcUrl)
     ]);
-    String btcRate = values[0]['rate'].toString();
-    String ethRate = values[1]['rate'].toString();
-    String ltcRate = values[2]['rate'].toString();
+    String btcRate = values[0]['rate'].toInt().toString();
+    String ethRate = values[1]['rate'].toInt().toString();
+    String ltcRate = values[2]['rate'].toInt().toString();
     return {
       'BTC': btcRate,
       'ETH': ethRate,
