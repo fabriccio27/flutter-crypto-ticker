@@ -13,33 +13,35 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
-  String exchangeRate = '?';
+  String btcExchangeRate = '?';
+  String ethExchangeRate = '?';
+  String ltcExchangeRate = '?';
   CoinData coinService = CoinData();
 
   @override
   initState(){
     super.initState();
-    getTickerData();
+    getInitialTickersData();
   }
 
   void onCurrencyChange(dynamic newCurrency) async {
-    String responseRate = await coinService.getExchangeRate(newCurrency);
+    Map responseRates = await coinService.getExchangeRates(newCurrency);
     setState(() {
       selectedCurrency = newCurrency.toString();
-      exchangeRate = responseRate;
+      btcExchangeRate = responseRates['BTC'];
+      ethExchangeRate = responseRates['ETH'];
+      ltcExchangeRate = responseRates['LTC'];
     });
   }
   
-
-  void getTickerData() async {
-    String responseRate = await coinService.getExchangeRate(selectedCurrency);
+  void getInitialTickersData() async {
+    Map responseRates = await coinService.getExchangeRates(selectedCurrency);
     setState(() {
-      exchangeRate = responseRate;
+      btcExchangeRate = responseRates['BTC'];
+      ethExchangeRate = responseRates['ETH'];
+      ltcExchangeRate = responseRates['LTC'];
     });
   }
-  
-  // then we need to resolve multiple promises/ futures at the same time
-
 
   DropdownButton getRegularDropdown() {
    return DropdownButton(
@@ -52,7 +54,6 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   CupertinoPicker iOSPicker() {
-
     return CupertinoPicker(
       itemExtent: 32,
       onSelectedItemChanged: onCurrencyChange,
@@ -77,27 +78,9 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $exchangeRate $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          CryptoRate(exchangeRate: btcExchangeRate, selectedCurrency: selectedCurrency, coin: 'BTC'),
+          CryptoRate(exchangeRate: ethExchangeRate, selectedCurrency: selectedCurrency, coin: 'ETH'),
+          CryptoRate(exchangeRate: ltcExchangeRate, selectedCurrency: selectedCurrency, coin: 'LTC'),
           Container(
             height: 150.0,
             alignment: Alignment.center,
@@ -106,6 +89,44 @@ class _PriceScreenState extends State<PriceScreen> {
             child: getPicker(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CryptoRate extends StatelessWidget {
+  const CryptoRate({
+    super.key,
+    required this.exchangeRate,
+    required this.selectedCurrency,
+    required this.coin,
+  });
+
+  final String exchangeRate;
+  final String selectedCurrency;
+  final String coin;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $coin = $exchangeRate $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }

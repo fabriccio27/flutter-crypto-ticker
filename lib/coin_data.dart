@@ -39,4 +39,23 @@ class CoinData {
     dynamic response = await requestsHelper.getData(url);
     return response['rate'].toString();
   }
+
+  Future<Map> getExchangeRates(String currency) async {
+    Uri btcUrl = Uri.https('rest.coinapi.io', '/v1/exchangerate/BTC/$currency');
+    Uri ethUrl = Uri.https('rest.coinapi.io', '/v1/exchangerate/ETH/$currency');
+    Uri ltcUrl = Uri.https('rest.coinapi.io', '/v1/exchangerate/LTC/$currency');
+    dynamic values = await Future.wait([
+      requestsHelper.getData(btcUrl),
+      requestsHelper.getData(ethUrl),
+      requestsHelper.getData(ltcUrl)
+    ]);
+    String btcRate = values[0]['rate'].toString();
+    String ethRate = values[1]['rate'].toString();
+    String ltcRate = values[2]['rate'].toString();
+    return {
+      'BTC': btcRate,
+      'ETH': ethRate,
+      'LTC': ltcRate
+    };
+  }
 }
