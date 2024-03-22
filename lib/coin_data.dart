@@ -36,7 +36,7 @@ class CoinData {
   Future<String> getExchangeRate(String currency) async {
     Uri url = Uri.https('rest.coinapi.io', '/v1/exchangerate/BTC/$currency');
 
-    dynamic response = requestsHelper.getData(url);
-    return response.rateData.toString();
+    dynamic response = await requestsHelper.getData(url);
+    return response['rate'].toString();
   }
 }

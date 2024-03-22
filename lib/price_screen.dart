@@ -12,33 +12,32 @@ class PriceScreen extends StatefulWidget {
 
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = currenciesList[0];
+  String selectedCurrency = 'USD';
   String exchangeRate = '?';
+  CoinData coinService = CoinData();
 
-
-  void onCurrencyChange(dynamic newCurrency) {
-    // this needs to fetch data and set both select currency and exchange rate
-    setState(() {
-      selectedCurrency = newCurrency.toString();
-    });
-  }
-  // need to override onInit to fetch always usd
   @override
   initState(){
     super.initState();
     getTickerData();
   }
 
+  void onCurrencyChange(dynamic newCurrency) async {
+    String responseRate = await coinService.getExchangeRate(newCurrency);
+    setState(() {
+      selectedCurrency = newCurrency.toString();
+      exchangeRate = responseRate;
+    });
+  }
+  
+
   void getTickerData() async {
-    CoinData coinService = CoinData();
     String responseRate = await coinService.getExchangeRate(selectedCurrency);
     setState(() {
       exchangeRate = responseRate;
     });
-
   }
   
-  // then need to fetch whenever we change the currency
   // then we need to resolve multiple promises/ futures at the same time
 
 
@@ -89,7 +88,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $exchangeRate USD',
+                  '1 BTC = $exchangeRate $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 20.0,
